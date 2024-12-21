@@ -1,0 +1,26 @@
+// breakpoint
+@mixin desk-sm {
+    @media (max-width: 1499px) {
+        @content;
+    }
+}
+@mixin tablet-mobile {
+    @media (max-width: 1200px) {
+        @content;
+    }
+}
+@mixin tablet {
+    @media only screen and (min-width: 601px) and (max-width: 1200px) {
+        @content;
+    }
+}
+@mixin mobile {
+    @media only screen and (max-width: 600px) {
+        @content;
+    }
+}
+@mixin mobile-sm {
+    @media only screen and (max-width: 350px) {
+        @content;
+    }
+}
