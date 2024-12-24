@@ -1,39 +1,39 @@
 import classNames from "classnames";
 import PropTypes from "prop-types";
-import React, { useContext } from "react";
-import { EditContext, TestFilterContext, TodoContext } from "./TodoList";
-import { StatusTodo } from "../constants/todo";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteTodo, getEditTodo, updateStatusTodo } from "../todoSlice";
+import { StatusTodo } from "../../../constants/todo";
 import ButtonConfirm from "./ButtonConfirm";
 
 const TodoItem = ({ todo }) => {
-  const { dispatch } = useContext(TodoContext);
-  const { setEdit } = useContext(EditContext);
-  const { stateFilter } = useContext(TestFilterContext);
-
-  const handleRemoveCompleted = (idTodo) => {
-    dispatch({ type: "delete", payload: { id: idTodo } });
-  };
+  const statusFilter = useSelector((state) => state.todo.statusFilter);
+  const dispatch = useDispatch();
   const handleUpdateStatus = (idTodo, statusTodo) => {
-    let newStatus = Number(statusTodo) + 1;
-    if (newStatus > 2) {
-      newStatus = 2;
+    let status = Number(statusTodo) + 1;
+    if (status > 2) {
+      status = 2;
     }
-    dispatch({
-      type: "updateStatus",
-      payload: {
+    dispatch(
+      updateStatusTodo({
         id: idTodo,
-        status: newStatus.toString(),
-        display: stateFilter === StatusTodo.ALL || newStatus.toString() === stateFilter ? "block" : "none",
-      },
-    });
+        status: status.toString(),
+        display: statusFilter === StatusTodo.ALL || status.toString() === statusFilter ? "block" : "none",
+      })
+    );
   };
-  const handleEditTodo = (todo) => {
-    setEdit({
-      isEdit: true,
-      todoEdit: todo,
-    });
+  const handleEditTodo = (newTodo) => {
+    console.log(newTodo, "test 1");
+    dispatch(
+      getEditTodo({
+        isEdit: true,
+        todoEdit: newTodo,
+      })
+    );
   };
-
+  const handleRemoveCompleted = (idTodo) => {
+    dispatch(deleteTodo({id: idTodo}));
+  };
   return (
     <>
       <div
@@ -67,18 +67,7 @@ const TodoItem = ({ todo }) => {
           {todo.status === "1" && "In progress"}
           {todo.status === "2" && "Completed"}
         </div>
-        <button
-          className="todo__edit todo__btn blue"
-          onClick={() =>
-            handleEditTodo({
-              id: todo.id,
-              name: todo.name,
-              desc: todo.desc,
-              status: todo.status,
-              should: todo.should,
-            })
-          }
-        >
+        <button className="todo__edit todo__btn blue" onClick={() => handleEditTodo(todo)}>
           <i className="fa-solid fa-pen-to-square"></i>
         </button>
         <ButtonConfirm

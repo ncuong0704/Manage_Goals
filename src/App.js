@@ -1,12 +1,12 @@
 import React from "react";
-import TodoList from "./components/TodoList";
-import "./index.css";
 import "./App.scss";
+import TodoFeature from "./features/todo/Todo";
+import "./index.css";
 
 function App() {
   return (
     <div className="app">
-      <TodoList title="Todo List" />
+      <TodoFeature title="To Do List"/>
   </div>
   );
 }

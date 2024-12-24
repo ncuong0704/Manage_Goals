@@ -1,15 +1,18 @@
-import classNames from "classnames";
-import PropTypes from "prop-types";
 import React from "react";
+import PropTypes from "prop-types";
+import classNames from "classnames";
 
-const ShowNotification = ({ isOpenProp, message, title, status, closeNotification }) => {
+const ShowNotification = ({ openNotification, message, title, status, closeNotification }) => {
   const closeConfirm = () => {
     closeNotification();
   };
   return (
     <>
-      <div className={classNames("modal", { active: isOpenProp })}></div>
-      <div className={classNames("popup", { active: isOpenProp })}>
+      <div className={classNames("modal", { active: openNotification })}></div>
+      <div className={classNames("popup", { active: openNotification })}>
+        <div className="popup__close" onClick={closeConfirm}>
+          <i className="fa-solid fa-xmark"></i>
+        </div>
         <div className="form">
           <h2
             className={classNames({
@@ -20,9 +23,6 @@ const ShowNotification = ({ isOpenProp, message, title, status, closeNotificatio
             {title}
           </h2>
           <p>{message}</p>
-          <button className="form__submit todo__btn green" onClick={closeConfirm}>
-            Confirm
-          </button>
         </div>
       </div>
     </>
@@ -30,7 +30,7 @@ const ShowNotification = ({ isOpenProp, message, title, status, closeNotificatio
 };
 
 ShowNotification.propTypes = {
-  isOpenProp: PropTypes.bool.isRequired,
+  openNotification: PropTypes.bool.isRequired,
   message: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   status: PropTypes.bool.isRequired,

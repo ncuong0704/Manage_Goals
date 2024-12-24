@@ -1,6 +1,6 @@
-import classNames from "classnames";
-import PropTypes from "prop-types";
 import React, { useState } from "react";
+import PropTypes from "prop-types";
+import classNames from "classnames";
 
 const ButtonConfirm = ({ message, name, removeCompleted, isTrash = false }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,8 +8,11 @@ const ButtonConfirm = ({ message, name, removeCompleted, isTrash = false }) => {
   const openConfirm = () => {
     setIsOpen(true);
   };
-
   const closeConfirm = () => {
+    setIsOpen(false);
+  };
+
+  const deleteConfirm = () => {
     setIsOpen(false);
     removeCompleted();
   };
@@ -27,10 +30,13 @@ const ButtonConfirm = ({ message, name, removeCompleted, isTrash = false }) => {
       <div className={classNames("modal", { active: isOpen })}></div>
 
       <div className={classNames("popup", { active: isOpen })}>
+        <div className="popup__close" onClick={closeConfirm}>
+          <i className="fa-solid fa-xmark"></i>
+        </div>
         <div className="form">
           <h2>Notification</h2>
           <p>{message}</p>
-          <button className="form__submit todo__btn green" onClick={closeConfirm}>
+          <button className="form__submit todo__btn green" onClick={deleteConfirm}>
             Confirm
           </button>
         </div>
