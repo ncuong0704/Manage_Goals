@@ -1,24 +1,24 @@
+import classNames from "classnames";
 import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { StatusTodo } from "../../../constants/todo";
-import classNames from "classnames";
-import TodoForm from "./TodoForm";
-import TodoItem from "./TodoItem";
 import { deleteAllCompleted, filterTodo, getEditTodo } from "../todoSlice";
 import ButtonConfirm from "./ButtonConfirm";
 import ShowNotification from "./ShowNotification";
+import TodoForm from "./TodoForm";
+import TodoItem from "./TodoItem";
 
-const statusOrder = {
-  1: 1,
-  0: 2,
-  2: 3,
+const formatTime = (datetimeStr) => {
+  const datetimeObj = new Date(datetimeStr);
+  const timestamp = datetimeObj.getTime();
+  return timestamp;
 };
 
-const TodoTable = (props) => {
+const TodoTable = () => {
   const statusFilter = useSelector((state) => state.todo.statusFilter);
   const [isOpen, setIsOpen] = useState(false);
   const todos = useSelector((state) => state.todo.todoList);
+  const type = useSelector((state) => state.todo.type);
   const [showNotification, setShowNotification] = useState({
     open: false,
     title: "",
@@ -46,19 +46,32 @@ const TodoTable = (props) => {
     dispatch(filterTodo({ status: e.target.value }));
   };
   const handleRemoveCompleted = () => {
-    const filterTodoCompleted = todos.filter((todo) => todo.status === StatusTodo.COMPLETED);
+    let filterTodoCompleted = null
+    switch (type) {
+      case "day":
+        filterTodoCompleted = todos.day.filter((todo) => todo.status === StatusTodo.COMPLETED);
+        break;
+      case "month":
+        filterTodoCompleted = todos.month.filter((todo) => todo.status === StatusTodo.COMPLETED);
+        break;
+      case "year":
+        filterTodoCompleted = todos.year.filter((todo) => todo.status === StatusTodo.COMPLETED);
+        break;
+      default:
+        break;
+    }
     if (filterTodoCompleted.length) {
       setShowNotification({
         open: true,
-        title: "Congratulations",
-        message: `You have completed "${filterTodoCompleted.length}" to-dos.`,
+        title: "Chúc mừng bạn",
+        message: `Bạn đã hoàn thành "${filterTodoCompleted.length}" mục tiêu.`,
         status: true,
       });
     } else {
       setShowNotification({
         open: true,
-        title: "Unfinished",
-        message: "You haven't completed any to-dos yet!",
+        title: "Rất tiếc!",
+        message: "Bạn chưa hoàn thành mục tiêu nào!",
         status: false,
       });
     }
@@ -74,7 +87,7 @@ const TodoTable = (props) => {
     <>
       <div className="todo__top">
         <button className="todo__btn green" onClick={handleOpenForm}>
-          Add
+          Thêm
         </button>
         <select
           className={classNames("todo__select ", {
@@ -83,46 +96,93 @@ const TodoTable = (props) => {
             green: statusFilter === "1",
             red: statusFilter === "2",
           })}
+          value={statusFilter}
           onChange={handleChangeFilter}
         >
           <option className="todo__option blue" value={StatusTodo.ALL}>
-            All
+            Tất cả
           </option>
           <option className="todo__option orange" value={StatusTodo.PENDING}>
-            Pending
+            Đang đợi
           </option>
           <option className="todo__option green" value={StatusTodo.IN_PROGRESS}>
-            In Progress
+            Đang thực hiện
           </option>
           <option className="todo__option red" value={StatusTodo.COMPLETED}>
-            Completed
+            Đã hoàn thành
           </option>
         </select>
       </div>
       <TodoForm isOpen={isOpen} handleCloseForm={handleCloseForm} />
       <ul className="todo__list">
-        {!todos.length && <li className="todo__not">Please click the "Add" button to add a to-do first!</li>}
-        {!!todos.length &&
-          todos
-            .slice() // Tạo một bản sao để tránh thay đổi mảng gốc
-            .sort((a, b) => statusOrder[a.status] - statusOrder[b.status]) // Sắp xếp theo thứ tự ưu tiên
-            .map((todo) => {
-              return (
-                <li
-                  className={classNames("todo__item", {
-                    hidden: todo.display === "none",
-                  })}
-                  key={todo.id}
-                >
-                  <TodoItem todo={todo} />
-                </li>
-              );
-            })}
+        {type === "day" && (
+          <>
+            {!todos.day.length && <li className="todo__not">Vui lòng nhấp vào nút "Thêm" để thêm một mục tiêu cần làm trước trong ngày!</li>}
+            {!!todos.day.length &&
+              todos.day
+                .slice() // Tạo một bản sao để tránh thay đổi mảng gốc
+                .sort((a, b) => formatTime(a.begin) - formatTime(b.begin)) // Sắp xếp theo thứ tự ưu tiên
+                .map((todo) => {
+                  return (
+                    <li
+                      className={classNames("todo__item", {
+                        hidden: todo.display === "none",
+                      })}
+                      key={todo.id}
+                    >
+                      <TodoItem todo={todo} /> 
+                    </li>
+                  );
+                })}
+          </>
+        )}
+        {type === "month" && (
+          <>
+            {!todos.month.length && <li className="todo__not">Vui lòng nhấp vào nút "Thêm" để thêm một mục tiêu cần làm trước trong tháng!</li>}
+            {!!todos.month.length &&
+              todos.month
+                .slice() // Tạo một bản sao để tránh thay đổi mảng gốc
+                .sort((a, b) => formatTime(a.begin) - formatTime(b.begin)) // Sắp xếp theo thứ tự ưu tiên
+                .map((todo) => {
+                  return (
+                    <li
+                      className={classNames("todo__item", {
+                        hidden: todo.display === "none",
+                      })}
+                      key={todo.id}
+                    >
+                      <TodoItem todo={todo} />
+                    </li>
+                  );
+                })}
+          </>
+        )}
+        {type === "year" && (
+          <>
+            {!todos.year.length && <li className="todo__not">Vui lòng nhấp vào nút "Thêm" để thêm một mục tiêu cần làm trước trong năm!</li>}
+            {!!todos.year.length &&
+              todos.year
+                .slice() // Tạo một bản sao để tránh thay đổi mảng gốc
+                .sort((a, b) => formatTime(a.begin) - formatTime(b.begin)) // Sắp xếp theo thứ tự ưu tiên
+                .map((todo) => {
+                  return (
+                    <li
+                      className={classNames("todo__item", {
+                        hidden: todo.display === "none",
+                      })}
+                      key={todo.id}
+                    >
+                      <TodoItem todo={todo} />
+                    </li>
+                  );
+                })}
+          </>
+        )}
       </ul>
       <ButtonConfirm
-        name="Completed"
+        name="Xoá đã hoàn thành"
         isTrash={true}
-        message="Are you sure the deletion is complete!"
+        message="Bạn có chắc xoá các mục tiêu đã hoàn thành?"
         removeCompleted={handleRemoveCompleted}
       />
       <ShowNotification

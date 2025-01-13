@@ -34,10 +34,10 @@ const ButtonConfirm = ({ message, name, removeCompleted, isTrash = false }) => {
           <i className="fa-solid fa-xmark"></i>
         </div>
         <div className="form">
-          <h2>Notification</h2>
+          <h2>Thông báo</h2>
           <p>{message}</p>
           <button className="form__submit todo__btn green" onClick={deleteConfirm}>
-            Confirm
+            Xác nhận
           </button>
         </div>
       </div>

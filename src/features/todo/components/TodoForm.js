@@ -29,6 +29,8 @@ const TodoForm = ({ isOpen, handleCloseForm }) => {
         id: edit.todoEdit.id,
         name: data.name,
         desc: data.desc,
+        begin: data.begin,
+        end: data.end,
         should: data.should,
         status: data.status,
         display: statusFilter === StatusTodo.ALL || data.status === statusFilter ? "block" : "none",
@@ -39,6 +41,8 @@ const TodoForm = ({ isOpen, handleCloseForm }) => {
         id: Date.now(),
         name: data.name,
         desc: data.desc,
+        begin: data.begin,
+        end: data.end,
         should: data.should,
         status: data.status,
         display: statusFilter === StatusTodo.ALL || data.status === statusFilter ? "block" : "none",
@@ -54,6 +58,8 @@ const TodoForm = ({ isOpen, handleCloseForm }) => {
       reset({
         name: edit.todoEdit.name || "",
         desc: edit.todoEdit.desc || "",
+        begin: edit.todoEdit.begin || "",
+        end: edit.todoEdit.end || "",
         should: edit.todoEdit.should || "0",
         status: edit.todoEdit.status || "0",
       });
@@ -61,6 +67,8 @@ const TodoForm = ({ isOpen, handleCloseForm }) => {
       reset({
         name: "",
         desc: "",
+        begin: "",
+        end: "",
         should: "0",
         status: "0",
       });
@@ -74,47 +82,57 @@ const TodoForm = ({ isOpen, handleCloseForm }) => {
           <div className="popup__close" onClick={handleCloseForm}>
             <i className="fa-solid fa-xmark"></i>
           </div>
-          <h2>{edit.isEdit ? "Edit Todo" : "Add Todo"}</h2>
+          <h2>{edit.isEdit ? "Chỉnh sửa mục tiêu" : "Thêm mục tiêu"}</h2>
           <div className="form__group">
-            <label htmlFor="name">Name</label>
+            <label htmlFor="name">Tên mục tiêu</label>
             <div className="form__field">
-              <input {...register("name")} type="text" id="name" maxLength="40" placeholder="Please enter todo name!" />
+              <input {...register("name")} type="text" id="name" maxLength="40" placeholder="Nhập mục tiêu!" />
               <div className="form__count">{watch("name") ? watch("name").length : 0}/40</div>
             </div>
             <div className="form__error">{errors.name?.message ?? ""}</div>
           </div>
           <div className="form__group">
-            <label htmlFor="desc">Description</label>
+            <label htmlFor="desc">Chi tiết</label>
             <div className="form__field">
               <textarea
                 {...register("desc")}
                 id="desc"
-                maxLength="100"
-                placeholder="Please enter todo description!"
+                maxLength="200"
+                placeholder="Nhập chi tiết mục tiêu!"
               ></textarea>
-              <div className="form__count">{watch("desc") ? watch("desc").length : 0}/100</div>
+              <div className="form__count">{watch("desc") ? watch("desc").length : 0}/200</div>
             </div>
             <div className="form__error">{errors.desc?.message ?? ""}</div>
           </div>
           <div className="form__group">
-            <label htmlFor="should">Should</label>
+            <label htmlFor="begin">Thời gian bắt đầu</label>
+            <input {...register("begin")} id="begin" type="datetime-local"></input>
+            <div className="form__error">{errors.begin?.message ?? ""}</div>
+          </div>
+          <div className="form__group">
+            <label htmlFor="end">Thời gian kết thúc</label>
+            <input {...register("end")} id="end" type="datetime-local"></input>
+            <div className="form__error">{errors.end?.message ?? ""}</div>
+          </div>
+          <div className="form__group">
+            <label htmlFor="should">Loại</label>
             <select {...register("should")} id="should">
-              <option value="0">Yes</option>
-              <option value="1">No</option>
+              <option value="0">Nên</option>
+              <option value="1">Không nên</option>
             </select>
             <div className="form__error">{errors.should?.message}</div>
           </div>
           <div className="form__group">
-            <label htmlFor="status">Status</label>
+            <label htmlFor="status">Trạng thái</label>
             <select {...register("status")} id="status">
-              <option value={StatusTodo.PENDING}>Pending</option>
-              <option value={StatusTodo.IN_PROGRESS}>In progress</option>
-              <option value={StatusTodo.COMPLETED}>Completed</option>
+              <option value={StatusTodo.PENDING}>Đang đợi</option>
+              <option value={StatusTodo.IN_PROGRESS}>Đang thực hiện</option>
+              <option value={StatusTodo.COMPLETED}>Đã hoàn thành</option>
             </select>
             <div className="form__error">{errors.status?.message}</div>
           </div>
           <button type="submit" className="form__submit todo__btn green">
-            Confirm
+            Xác nhận
           </button>
         </form>
       </div>

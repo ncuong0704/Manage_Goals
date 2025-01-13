@@ -30,7 +30,7 @@ body {
     height: calc(100% - 40px);
     max-width: 100%;
     background-color: $blue-light-color;
-    padding: 60px 40px 20px;
+    padding: 100px 40px 20px;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
@@ -41,17 +41,25 @@ body {
         width: 100%;
     }
     @include mobile {
-        padding: 30px 20px 10px;
+        padding: 100px 20px 10px;
+    }
+    &__nav{
+        position: absolute;
+        top: 30px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-evenly;
+        height: 40px;
     }
     &__heading {
         font-size: 40px;
         text-align: center;
         color: $blue-color;
-        margin: 0 0 40px 0;
+        margin: 0 0 30px 0;
         line-height: 1;
         @include mobile {
             font-size: 30px;
-            margin-bottom: 24px;
         }
     }
     &__btn {
@@ -64,6 +72,7 @@ body {
         display: flex;
         align-items: center;
         justify-content: center;
+        white-space: nowrap;
         padding: 0 20px;
         cursor: pointer;
         transition: all ease-out 0.3s;
@@ -82,6 +91,15 @@ body {
         }
         &.orange {
             background-color: $orange-color;
+        }
+        &.border{
+            background-color: $white-color;
+            border: 1px solid $blue-color;
+            color: $blue-color;
+            &.active{
+                background-color: $blue-color;
+                color: $white-color;
+            }
         }
     }
     &__top {
@@ -220,6 +238,19 @@ body {
         justify-content: right;
         margin-top: 10px;
     }
+    &__date{
+        margin-right: auto;
+        font-size: 14px;
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+        & .expired{
+            color: $red-color;
+            font-weight: 600;
+            display: block;
+            margin-right: 20px;
+        }
+    }
     &__trash {
         margin-top: 10px;
         i {
@@ -265,6 +296,8 @@ body {
     border-radius: 20px;
     width: 400px;
     max-width: 100%;
+    max-height: calc(100% - 20px);
+    overflow: auto;
     opacity: 0;
     visibility: hidden;
     transition: all ease-out 0.3s;
@@ -301,11 +334,11 @@ body {
         text-align: center;
     }
     &__group {
-        margin-bottom: 12px;
+        margin-bottom: 24px;
         label {
-            width: 65px;
             display: inline-block;
             font-weight: 500;
+            margin-right: 15px;
         }
         input,
         textarea,
@@ -323,7 +356,7 @@ body {
         textarea {
             height: 110px;
             width: 100%;
-            padding: 10px;
+            padding: 10px 10px 15px;
             resize: none;
         }
         select {
@@ -334,6 +367,7 @@ body {
     &__error {
         font-size: 13px;
         color: $red-color;
+        margin-top: 3px;
     }
     &__submit {
         margin: 30px auto 0;

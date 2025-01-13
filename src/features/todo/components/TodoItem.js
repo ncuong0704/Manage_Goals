@@ -6,6 +6,27 @@ import { deleteTodo, getEditTodo, updateStatusTodo } from "../todoSlice";
 import { StatusTodo } from "../../../constants/todo";
 import ButtonConfirm from "./ButtonConfirm";
 
+const formatDate = (datetime) => {
+  const dateObj = new Date(datetime);
+  const day = dateObj.getDate().toString().padStart(2, "0");
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, "0");
+  const year = dateObj.getFullYear();
+  const hours = dateObj.getHours().toString().padStart(2, "0");
+  const minutes = dateObj.getMinutes().toString().padStart(2, "0");
+
+  return `${hours}:${minutes}  ${day}/${month}/${year}`;
+};
+
+const formatTime = (datetimeStr) => {
+  const datetimeObj = new Date(datetimeStr);
+  const timestamp = datetimeObj.getTime();
+  return timestamp;
+};
+const compareTime = (time1) => {
+  const current = new Date();
+  return current.getTime() > formatTime(time1);
+};
+
 const TodoItem = ({ todo }) => {
   const statusFilter = useSelector((state) => state.todo.statusFilter);
   const dispatch = useDispatch();
@@ -32,18 +53,28 @@ const TodoItem = ({ todo }) => {
     );
   };
   const handleRemoveCompleted = (idTodo) => {
-    dispatch(deleteTodo({id: idTodo}));
+    dispatch(deleteTodo({ id: idTodo }));
   };
   return (
     <>
+     <div className="todo__date">
+          <span
+            className={classNames({
+              expired: compareTime(todo.end),
+            })}
+          >
+            {compareTime(todo.end) && "Chưa hoàn thành"}
+          </span>
+          <span>{`${formatDate(todo.begin)} - ${formatDate(todo.end)}`}</span>
+        </div>
       <div
         className={classNames("todo__should", {
           yes: todo.should === "0",
           not: todo.should === "1",
         })}
       >
-        {todo.should === "0" && "Should"}
-        {todo.should === "1" && "Not should"}
+        {todo.should === "0" && "Nên"}
+        {todo.should === "1" && "Không nên"}
       </div>
       <div
         className={classNames("todo__content", {
@@ -53,7 +84,6 @@ const TodoItem = ({ todo }) => {
         <h3 className="todo__name">{todo.name}</h3>
         <p className="todo__desc">{todo.desc}</p>
       </div>
-
       <div className="todo__action">
         <div
           onDoubleClick={() => handleUpdateStatus(todo.id, todo.status)}
@@ -63,16 +93,16 @@ const TodoItem = ({ todo }) => {
             red: todo.status === "2",
           })}
         >
-          {todo.status === "0" && "Pending"}
-          {todo.status === "1" && "In progress"}
-          {todo.status === "2" && "Completed"}
+          {todo.status === "0" && "Đang đợi"}
+          {todo.status === "1" && "Đang thực hiện"}
+          {todo.status === "2" && "Đã hoàn thành"}
         </div>
         <button className="todo__edit todo__btn blue" onClick={() => handleEditTodo(todo)}>
           <i className="fa-solid fa-pen-to-square"></i>
         </button>
         <ButtonConfirm
           name=""
-          message="Are you sure you can delete this todo?"
+          message="Bạn có chắc chắn xoá mục tiêu này?"
           removeCompleted={() => handleRemoveCompleted(todo.id)}
         />
       </div>
