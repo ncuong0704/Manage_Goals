@@ -100,11 +100,11 @@ const TodoItem = ({ todo }) => {
         <button className="todo__edit todo__btn blue" onClick={() => handleEditTodo(todo)}>
           <i className="fa-solid fa-pen-to-square"></i>
         </button>
-        <ButtonConfirm
+        {/* <ButtonConfirm
           name=""
           message="Bạn có chắc chắn xoá mục tiêu này?"
           removeCompleted={() => handleRemoveCompleted(todo.id)}
-        />
+        /> */}
       </div>
     </>
   );
