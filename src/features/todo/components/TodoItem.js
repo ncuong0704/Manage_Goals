@@ -65,7 +65,7 @@ const TodoItem = ({ todo }) => {
           >
             {todo.status !== StatusTodo.COMPLETED && compareTime(todo.end) && "Chưa hoàn thành"}
           </span>
-          <span>{`${formatDate(todo.begin)} - ${formatDate(todo.end)}`}</span>
+          <span>{`Bắt đầu: ${formatDate(todo.begin)}`} <br /> {`Kết thúc: ${formatDate(todo.end)}`}</span>
         </div>
       <div
         className={classNames("todo__should", {
