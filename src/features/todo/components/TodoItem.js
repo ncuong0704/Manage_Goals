@@ -63,7 +63,7 @@ const TodoItem = ({ todo }) => {
               expired: compareTime(todo.end),
             })}
           >
-            {!todo.status === "2" && compareTime(todo.end) && "Chưa hoàn thành"}
+            {todo.status !== StatusTodo.COMPLETED && compareTime(todo.end) && "Chưa hoàn thành"}
           </span>
           <span>{`${formatDate(todo.begin)} - ${formatDate(todo.end)}`}</span>
         </div>
