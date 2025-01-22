@@ -60,11 +60,11 @@ const TodoItem = ({ todo }) => {
      <div className="todo__date">
           <span
             className={classNames({
-              start: compareTime(todo.begin) && !compareTime(todo.end),
+              start: compareTime(todo.begin) && !compareTime(todo.end) && todo.status === StatusTodo.PENDING,
               expired: compareTime(todo.end),
             })}
           >
-            {todo.status !== StatusTodo.COMPLETED && compareTime(todo.begin) && !compareTime(todo.end) && "Đã đến hẹn" }
+            {todo.status === StatusTodo.PENDING && compareTime(todo.begin) && !compareTime(todo.end) && "Đã đến hẹn" }
             {todo.status !== StatusTodo.COMPLETED && compareTime(todo.end) && "Chưa hoàn thành" }
           </span>
           <span>{`Bắt đầu: ${formatDate(todo.begin)}`} <br /> {`Kết thúc: ${formatDate(todo.end)}`}</span>
