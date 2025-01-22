@@ -250,6 +250,12 @@ body {
             display: block;
             margin-right: auto;
         }
+        & .start{
+            color: $green-color;
+            font-weight: 600;
+            display: block;
+            margin-right: auto;
+        }
     }
     &__trash {
         margin-top: 10px;
