@@ -1,10 +1,11 @@
 import classNames from "classnames";
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteTodo, getEditTodo, updateStatusTodo } from "../todoSlice";
 import { StatusTodo } from "../../../constants/todo";
 import ButtonConfirm from "./ButtonConfirm";
+import useNotificationSound from "../../../hooks/useNotificationSound";
 
 const formatDate = (datetime) => {
   const dateObj = new Date(datetime);
@@ -22,6 +23,7 @@ const formatTime = (datetimeStr) => {
   const timestamp = datetimeObj.getTime();
   return timestamp;
 };
+
 const compareTime = (time1) => {
   const current = new Date();
   return current.getTime() > formatTime(time1);
@@ -30,6 +32,34 @@ const compareTime = (time1) => {
 const TodoItem = ({ todo }) => {
   const statusFilter = useSelector((state) => state.todo.statusFilter);
   const dispatch = useDispatch();
+  const playNotification = useNotificationSound();
+
+  // Kiểm tra và phát âm thanh khi công việc đến hạn
+  useEffect(() => {
+    const checkAndNotify = () => {
+      if (
+        todo.status === StatusTodo.PENDING &&
+        compareTime(todo.begin)
+      ) {
+        playNotification();
+      }
+      if (
+        todo.status === StatusTodo.IN_PROGRESS &&
+        compareTime(todo.end)
+      ) {
+        playNotification();
+      }
+    };
+
+    // Kiểm tra ngay khi component được mount
+    checkAndNotify();
+
+    // Kiểm tra mỗi phút
+    const interval = setInterval(checkAndNotify, 60000);
+
+    return () => clearInterval(interval);
+  }, [todo.begin, todo.end, todo.status, playNotification]);
+
   const handleUpdateStatus = (idTodo, statusTodo) => {
     let status = Number(statusTodo) + 1;
     if (status > 2) {
@@ -43,8 +73,8 @@ const TodoItem = ({ todo }) => {
       })
     );
   };
+
   const handleEditTodo = (newTodo) => {
-    console.log(newTodo, "test 1");
     dispatch(
       getEditTodo({
         isEdit: true,
@@ -52,23 +82,25 @@ const TodoItem = ({ todo }) => {
       })
     );
   };
+
   const handleRemoveCompleted = (idTodo) => {
     dispatch(deleteTodo({ id: idTodo }));
   };
+
   return (
     <>
-     <div className="todo__date">
-          <span
-            className={classNames({
-              start: compareTime(todo.begin) && !compareTime(todo.end) && todo.status === StatusTodo.PENDING,
-              expired: compareTime(todo.end),
-            })}
-          >
-            {todo.status === StatusTodo.PENDING && compareTime(todo.begin) && !compareTime(todo.end) && "Đã đến hẹn" }
-            {todo.status !== StatusTodo.COMPLETED && compareTime(todo.end) && "Chưa hoàn thành" }
-          </span>
-          <span>{`Bắt đầu: ${formatDate(todo.begin)}`} <br /> {`Kết thúc: ${formatDate(todo.end)}`}</span>
-        </div>
+      <div className="todo__date">
+        <span
+          className={classNames({
+            start: compareTime(todo.begin) && !compareTime(todo.end) && todo.status === StatusTodo.PENDING,
+            expired: compareTime(todo.end),
+          })}
+        >
+          {todo.status === StatusTodo.PENDING && compareTime(todo.begin) && !compareTime(todo.end) && "Đã đến hẹn"}
+          {todo.status !== StatusTodo.COMPLETED && compareTime(todo.end) && "Chưa hoàn thành"}
+        </span>
+        <span>{`Bắt đầu: ${formatDate(todo.begin)}`} <br /> {`Kết thúc: ${formatDate(todo.end)}`}</span>
+      </div>
       <div
         className={classNames("todo__should", {
           yes: todo.should === "0",
@@ -102,11 +134,6 @@ const TodoItem = ({ todo }) => {
         <button className="todo__edit todo__btn blue" onClick={() => handleEditTodo(todo)}>
           <i className="fa-solid fa-pen-to-square"></i>
         </button>
-        {/* <ButtonConfirm
-          name=""
-          message="Bạn có chắc chắn xoá mục tiêu này?"
-          removeCompleted={() => handleRemoveCompleted(todo.id)}
-        /> */}
       </div>
     </>
   );

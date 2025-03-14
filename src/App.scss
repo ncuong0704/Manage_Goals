@@ -1,1 +1,6 @@
 @use './styles/main';
+@import "./styles/notification.scss";
+
+.App {
+  text-align: center;
+}

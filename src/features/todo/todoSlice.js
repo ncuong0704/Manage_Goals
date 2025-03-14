@@ -1,6 +1,38 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { StatusTodo } from "../../constants/todo";
-import { date } from "yup";
+
+// Tạo helper function để tránh lặp code
+const createTodoItem = (payload) => ({
+  id: Date.now(),
+  name: payload.name,
+  desc: payload.desc,
+  begin: payload.begin,
+  end: payload.end,
+  status: payload.status,
+  should: payload.should,
+  display: payload.display,
+});
+
+const updateTodoItem = (todo, payload) => ({
+  ...todo,
+  name: payload?.name ?? todo.name,
+  desc: payload.desc ?? todo.desc,
+  begin: payload.begin ?? todo.begin,
+  end: payload.end ?? todo.end,
+  status: payload.status ?? todo.status,
+  should: payload.should ?? todo.should,
+  display: payload.display ?? todo.display,
+});
+
+const getInitialTodoList = () => {
+  const savedTodos = localStorage.getItem("todoList");
+  const parsedTodos = savedTodos ? JSON.parse(savedTodos) : { day: [], month: [], year: [] };
+  return {
+    day: parsedTodos.day || [],
+    month: parsedTodos.month || [],
+    year: parsedTodos.year || [],
+  };
+};
 
 export const todoSlice = createSlice({
   name: "todo",
@@ -11,258 +43,76 @@ export const todoSlice = createSlice({
       isEdit: false,
       todoEdit: {},
     },
-    todoList: {
-      day: localStorage.getItem("todoList") ? JSON.parse(localStorage.getItem("todoList")).day : [],
-      month: localStorage.getItem("todoList") ? JSON.parse(localStorage.getItem("todoList")).month : [],
-      year: localStorage.getItem("todoList") ? JSON.parse(localStorage.getItem("todoList")).year : [],
-    },
+    todoList: getInitialTodoList(),
   },
   reducers: {
     changeType: (state, action) => {
       state.type = action.payload;
       state.statusFilter = StatusTodo.ALL;
-      switch (state.type) {
-        case "day":
-          state.todoList.day = state.todoList.day.map((todo) => ({
-            ...todo,
-            display: "block",
-          }));
-          break;
-        case "month":
-          state.todoList.month = state.todoList.month.map((todo) => ({
-            ...todo,
-            display: "block",
-          }));
-          break;
-        case "year":
-          state.todoList.year = state.todoList.year.map((todo) => ({
-            ...todo,
-            display: "block",
-          }));
-          break;
-        default:
-          break;
-      }
+      state.todoList[state.type] = state.todoList[state.type].map(todo => ({
+        ...todo,
+        display: "block",
+      }));
     },
-    addTodo: (state, action) => {
-      switch (state.type) {
-        case "day":
-          state.todoList.day.push({
-            id: Date.now(),
-            name: action.payload.name,
-            desc: action.payload.desc,
-            begin: action.payload.begin,
-            end: action.payload.end,
-            status: action.payload.status,
-            should: action.payload.should,
-            display: action.payload.display,
-          });
-          break;
-        case "month":
-          state.todoList.month.push({
-            id: Date.now(),
-            name: action.payload.name,
-            desc: action.payload.desc,
-            begin: action.payload.begin,
-            end: action.payload.end,
-            status: action.payload.status,
-            should: action.payload.should,
-            display: action.payload.display,
-          });
-          break;
-        case "year":
-          state.todoList.year.push({
-            id: Date.now(),
-            name: action.payload.name,
-            desc: action.payload.desc,
-            begin: action.payload.begin,
-            end: action.payload.end,
-            status: action.payload.status,
-            should: action.payload.should,
-            display: action.payload.display,
-          });
-          break;
 
-        default:
-          break;
-      }
+    addTodo: (state, action) => {
+      state.todoList[state.type].push(createTodoItem(action.payload));
       state.editTodo = {
         isEdit: false,
         todoEdit: {},
       };
     },
+
     editTodo: (state, action) => {
-      switch (state.type) {
-        case "day":
-          state.todoList.day = state.todoList.day.map((todo) =>
-            todo.id === action.payload.id
-              ? {
-                  ...todo,
-                  name: action.payload?.name ?? todo.name,
-                  desc: action.payload.desc ?? todo.desc,
-                  begin: action.payload.begin ?? todo.begin,
-                  end: action.payload.end ?? todo.end,
-                  status: action.payload.status ?? todo.status,
-                  should: action.payload.should ?? todo.should,
-                  display: action.payload.display ?? todo.display,
-                }
-              : todo
-          );
-          break;
-        case "month":
-          state.todoList.month = state.todoList.month.map((todo) =>
-            todo.id === action.payload.id
-              ? {
-                  ...todo,
-                  name: action.payload?.name ?? todo.name,
-                  desc: action.payload.desc ?? todo.desc,
-                  begin: action.payload.begin ?? todo.begin,
-                  end: action.payload.end ?? todo.end,
-                  status: action.payload.status ?? todo.status,
-                  should: action.payload.should ?? todo.should,
-                  display: action.payload.display ?? todo.display,
-                }
-              : todo
-          );
-          break;
-        case "year":
-          state.todoList.year = state.todoList.year.map((todo) =>
-            todo.id === action.payload.id
-              ? {
-                  ...todo,
-                  name: action.payload?.name ?? todo.name,
-                  desc: action.payload.desc ?? todo.desc,
-                  begin: action.payload.begin ?? todo.begin,
-                  end: action.payload.end ?? todo.end,
-                  status: action.payload.status ?? todo.status,
-                  should: action.payload.should ?? todo.should,
-                  display: action.payload.display ?? todo.display,
-                }
-              : todo
-          );
-          break;
-        default:
-          break;
-      }
+      state.todoList[state.type] = state.todoList[state.type].map(todo =>
+        todo.id === action.payload.id ? updateTodoItem(todo, action.payload) : todo
+      );
     },
+
     updateStatusTodo: (state, action) => {
       const { id, status, display } = action.payload;
-      switch (state.type) {
-        case "day":
-          const indexItem = state.todoList.day.findIndex((x) => x.id === id);
-          if (indexItem !== -1) {
-            state.todoList.day[indexItem].status = status;
-            state.todoList.day[indexItem].display = display;
-          }
-          break;
-        case "month":
-          const indexItemMonth = state.todoList.month.findIndex((x) => x.id === id);
-          if (indexItemMonth !== -1) {
-            state.todoList.month[indexItemMonth].status = status;
-            state.todoList.month[indexItemMonth].display = display;
-          }
-          break;
-        case "year":
-          const indexItemYear = state.todoList.year.findIndex((x) => x.id === id);
-          if (indexItemYear !== -1) {
-            state.todoList.year[indexItemYear].status = status;
-            state.todoList.year[indexItemYear].display = display;
-          }
-          break;
-        default:
-          break;
+      const todoIndex = state.todoList[state.type].findIndex(x => x.id === id);
+      if (todoIndex !== -1) {
+        state.todoList[state.type][todoIndex].status = status;
+        state.todoList[state.type][todoIndex].display = display;
       }
     },
+
     deleteTodo: (state, action) => {
       const { id } = action.payload;
-      switch (state.type) {
-        case "day":
-          const indexTodo = state.todoList.day.findIndex((x) => x.id === id);
-          if (indexTodo !== -1) {
-            state.todoList.day.splice(indexTodo, 1);
-          }
-          break;
-        case "month":
-          const indexTodoMonth = state.todoList.month.findIndex((x) => x.id === id);
-          if (indexTodoMonth !== -1) {
-            state.todoList.month.splice(indexTodoMonth, 1);
-          }
-          break;
-        case "year":
-          const indexTodoYear = state.todoList.year.findIndex((x) => x.id === id);
-          if (indexTodoYear !== -1) {
-            state.todoList.year.splice(indexTodoYear, 1);
-          }
-          break;
-        default:
-          break;
-      }
+      state.todoList[state.type] = state.todoList[state.type].filter(todo => todo.id !== id);
     },
-    deleteAllCompleted: (state, action) => {
-      switch (state.type) {
-        case "day":
-          state.todoList.day = state.todoList.day.filter((todo) => todo.status !== StatusTodo.COMPLETED);
-          break;
-        case "month":
-          state.todoList.month = state.todoList.month.filter((todo) => todo.status !== StatusTodo.COMPLETED);
-          break;
-        case "year":
-          state.todoList.year = state.todoList.year.filter((todo) => todo.status !== StatusTodo.COMPLETED);
-          break;
-        default:
-          break;
-      }
+
+    deleteAllCompleted: (state) => {
+      state.todoList[state.type] = state.todoList[state.type].filter(
+        todo => todo.status !== StatusTodo.COMPLETED
+      );
     },
+
     filterTodo: (state, action) => {
-      const { status } = action.payload;
+      const status = action.payload.status;
       state.statusFilter = status;
-      switch (state.type) {
-        case "day":
-          state.todoList.day = state.todoList.day.map((todo) => ({
-            ...todo,
-            display: status === StatusTodo.ALL || todo.status === status ? "block" : "none",
-          }));
-          break;
-        case "month":
-          state.todoList.month = state.todoList.month.map((todo) => ({
-            ...todo,
-            display: status === StatusTodo.ALL || todo.status === status ? "block" : "none",
-          }));
-          break;
-        case "year":
-          state.todoList.year = state.todoList.year.map((todo) => ({
-            ...todo,
-            display: status === StatusTodo.ALL || todo.status === status ? "block" : "none",
-          }));
-          break;
-        default:
-          break;
-      }
+      state.todoList[state.type] = state.todoList[state.type].map(todo => ({
+        ...todo,
+        display: status === StatusTodo.ALL || todo.status === status ? "block" : "none",
+      }));
     },
-    setStatusTodo: (state, action) => {
-      state.statusFilter = action.payload.statusFilter;
-    },
+
     getEditTodo: (state, action) => {
-      const { isEdit, todoEdit } = action.payload;
-      state.editTodo.isEdit = isEdit;
-      state.editTodo.todoEdit = todoEdit;
+      state.editTodo = action.payload;
     },
   },
 });
 
 const { reducer, actions } = todoSlice;
-// Export actions
 export const {
   changeType,
   addTodo,
   editTodo,
-  deleteTodo,
   updateStatusTodo,
+  deleteTodo,
   deleteAllCompleted,
   filterTodo,
-  setStatusTodo,
   getEditTodo,
 } = actions;
-
-// Export reducer
 export default reducer;

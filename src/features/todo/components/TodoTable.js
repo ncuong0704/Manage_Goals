@@ -19,20 +19,31 @@ const TodoTable = () => {
   const [isOpen, setIsOpen] = useState(false);
   const todos = useSelector((state) => state.todo.todoList);
   const type = useSelector((state) => state.todo.type);
+  const dispatch = useDispatch();
   const [showNotification, setShowNotification] = useState({
     open: false,
     title: "",
     message: "",
     status: false,
   });
+
+  // Lưu todoList vào localStorage khi có thay đổi
   useEffect(() => {
     localStorage.setItem("todoList", JSON.stringify(todos));
   }, [todos]);
 
-  const dispatch = useDispatch();
+  // Tự động cập nhật và lọc dữ liệu mỗi giây
+  useEffect(() => {
+    const interval = setInterval(() => {
+      dispatch(filterTodo({ status: statusFilter }));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [dispatch, statusFilter]);
+
   const handleOpenForm = () => {
     setIsOpen(true);
   };
+
   const handleCloseForm = () => {
     setIsOpen(false);
     dispatch(
@@ -42,11 +53,13 @@ const TodoTable = () => {
       })
     );
   };
+
   const handleChangeFilter = (e) => {
     dispatch(filterTodo({ status: e.target.value }));
   };
+
   const handleRemoveCompleted = () => {
-    let filterTodoCompleted = null
+    let filterTodoCompleted = null;
     switch (type) {
       case "day":
         filterTodoCompleted = todos.day.filter((todo) => todo.status === StatusTodo.COMPLETED);
@@ -77,12 +90,14 @@ const TodoTable = () => {
     }
     dispatch(deleteAllCompleted());
   };
+
   const handleCloseNotification = () => {
     setShowNotification({
       ...showNotification,
       open: false,
     });
   };
+
   return (
     <>
       <div className="todo__top">
@@ -130,7 +145,7 @@ const TodoTable = () => {
                       })}
                       key={todo.id}
                     >
-                      <TodoItem todo={todo} /> 
+                      <TodoItem todo={todo} />
                     </li>
                   );
                 })}
