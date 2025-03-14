@@ -2,32 +2,13 @@ import { useEffect, useRef } from 'react';
 
 const useNotificationSound = () => {
   const audioContextRef = useRef(null);
-  const sourceRef = useRef(null);
-  const bufferRef = useRef(null);
+  const gainNodeRef = useRef(null);
 
   useEffect(() => {
-    // Khởi tạo AudioContext khi component mount
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     audioContextRef.current = new AudioContext();
-
-    // Tạo một oscillator đơn giản làm âm thanh thông báo
-    const createNotificationBuffer = () => {
-      const sampleRate = audioContextRef.current.sampleRate;
-      const duration = 0.2;  // 200ms
-      const bufferSize = sampleRate * duration;
-      const buffer = audioContextRef.current.createBuffer(1, bufferSize, sampleRate);
-      const data = buffer.getChannelData(0);
-
-      // Tạo một âm thanh "beep" đơn giản
-      for (let i = 0; i < bufferSize; i++) {
-        const t = i / sampleRate;
-        data[i] = Math.sin(2 * Math.PI * 880 * t) * Math.exp(-5 * t);
-      }
-
-      bufferRef.current = buffer;
-    };
-
-    createNotificationBuffer();
+    gainNodeRef.current = audioContextRef.current.createGain();
+    gainNodeRef.current.connect(audioContextRef.current.destination);
 
     return () => {
       if (audioContextRef.current) {
@@ -37,13 +18,26 @@ const useNotificationSound = () => {
   }, []);
 
   const playNotification = () => {
-    if (audioContextRef.current && bufferRef.current) {
+    if (audioContextRef.current && gainNodeRef.current) {
       try {
-        // Tạo source mới cho mỗi lần phát
-        const source = audioContextRef.current.createBufferSource();
-        source.buffer = bufferRef.current;
-        source.connect(audioContextRef.current.destination);
-        source.start();
+        const currentTime = audioContextRef.current.currentTime;
+        
+        // Tạo oscillator với tần số thấp hơn và dễ chịu hơn
+        const oscillator = audioContextRef.current.createOscillator();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(440, currentTime); // Tần số A4 (La)
+        
+        // Điều chỉnh âm lượng
+        const gainNode = gainNodeRef.current;
+        gainNode.gain.setValueAtTime(0, currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, currentTime + 0.05);
+        gainNode.gain.linearRampToValueAtTime(0, currentTime + 0.5);
+        
+        // Kết nối và phát âm thanh
+        oscillator.connect(gainNode);
+        oscillator.start(currentTime);
+        oscillator.stop(currentTime + 0.5);
+        
         console.log('Âm thanh đang phát');
       } catch (error) {
         console.error('Lỗi khi phát âm thanh:', error);

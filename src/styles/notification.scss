@@ -16,7 +16,13 @@
 .todo__date {
   .start {
     animation: notification-pulse 1s infinite;
-    color: #ff6b6b;
+    font-weight: bold;
+  }
+}
+
+.todo__date {
+  .expired {
+    animation: notification-pulse 1s infinite;
     font-weight: bold;
   }
 }
