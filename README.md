@@ -29,7 +29,7 @@
 
 ### 📦 React Redux
 
-### 🪝 React Hook Form
+### 📱 React Hook Form
 
 ### ✅ Yup (for validation)
 
