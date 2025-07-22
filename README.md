@@ -1,6 +1,8 @@
 # 🎯 Todo List
 ![alt text](image.png)
-<a target="_blank" href='https://todo-list-by-nguyen-cuong.vercel.app/'>Link demo</a>
+
+### Link: https://todo-list-by-nguyen-cuong.vercel.app
+
 ## 🚀 Key Features
 ### ✅ Manage goals by day / month / year.
 
