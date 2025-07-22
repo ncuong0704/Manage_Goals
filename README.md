@@ -1,8 +1,9 @@
 # 🎯 Todo List
-
+![alt text](image.png)
+[Link demo](https://todo-list-by-nguyen-cuong.vercel.app/)
 ## 🚀 Key Features
 ### ✅ Manage goals by day / month / year.
-![alt text](image.png)
+
 ### ➕ Add, ✏️ edit, 🗑️ delete goals easily.
 
 ### 🔍 Filter goals based on time.
